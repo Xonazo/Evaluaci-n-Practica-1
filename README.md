@@ -1,4 +1,4 @@
-# Evaluaci-n-Practica-1
+# Evaluacion-Practica-1
 
 Integrantes:
 Nelson Rubio

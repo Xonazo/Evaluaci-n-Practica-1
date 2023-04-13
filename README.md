@@ -5,4 +5,4 @@ Nelson Rubio <br>
 Edison Muñoz
 
 
-<p>Asignatura: Taller Avanzado Desarrollo Web </p>
+Asignatura: Taller Avanzado Desarrollo Web 

@@ -11,7 +11,8 @@ import dislike from './assets/dislike.png'
 function App() {
 
   const [perro, setPerro] = useState()
-
+  const [aceptado, setAceptado] = useState([])
+  const [rechazado, setRechazado] = useState([])
 
   const obtenerPerro = () => {
     axios
@@ -25,6 +26,15 @@ function App() {
     obtenerPerro()
   }, [])
 
+  const aceptarPerro = (index) => {
+    setAceptado([...aceptado, perro]);
+    obtenerPerro();
+  }
+
+  const rechazarPerro = (index) => {
+    setRechazado([...rechazado, perro]);
+    obtenerPerro();
+  }
 
 
   return (
@@ -37,7 +47,9 @@ function App() {
           item md={3}
           sx={{ background: "white", width: "400px", height: "600px", border: "2px solid black" }}
           borderRadius={5}>
-          <h1>1</h1>
+          {rechazado.map((image, index) => (
+            <img key={index} src={image} alt="Perro aleatorio" style={{ width: "250px", height: "25%", borderRadius: "3%", margin:"10px" }} onClick={() => handleLeftClick(index)} />
+          ))}
         </Grid>
         <Grid
           item md={5}
@@ -49,11 +61,11 @@ function App() {
               Sixto Pascual
             </h1>
           </Box>
-          <Box sx={{ justifyContent: 'space-around',display:"flex", margin:"80px" }}>
-            <IconButton disableTouchRipple sx={{ '&:focus': { outline: 'none'} }}>
-              <img src={dislike} alt="dislike" style={{ width: "45px", height: "40px",  }} />
+          <Box sx={{ justifyContent: 'space-around', display: "flex", margin: "80px" }}>
+            <IconButton onClick={rechazarPerro} disableTouchRipple sx={{ '&:focus': { outline: 'none' } }}>
+              <img src={dislike} alt="dislike" style={{ width: "45px", height: "40px", }} />
             </IconButton>
-            <IconButton disableTouchRipple sx={{ '&:focus': { outline: 'none' } }}>
+            <IconButton onClick={aceptarPerro} disableTouchRipple sx={{ '&:focus': { outline: 'none' } }}>
               <img src={like} alt="like" style={{ width: "55px", height: "50px" }} />
             </IconButton>
 
@@ -63,7 +75,9 @@ function App() {
           item md={3}
           sx={{ background: "white ", width: "400px", height: "600px", border: "2px solid black" }}
           borderRadius={5}>
-          <h1>3</h1>
+          {aceptado.map((image, index) => (
+            <img key={index} src={image} alt="Perro aleatorio" style={{ width: "250px", height: "25%", borderRadius: "3%", margin:"10px" }} onClick={() => handleLeftClick(index)} />
+          ))}
         </Grid>
       </Grid>
     </Box>

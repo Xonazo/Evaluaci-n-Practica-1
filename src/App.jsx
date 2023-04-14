@@ -17,27 +17,36 @@ function App() {
   const [apellidos, setApellidos] = useState([])
   const [loading, setLoading] = useState(true)
 
+  const [perroConNombre, setPerroConNombre] = useState({
+    imagen: '',
+    nombre: '',
+    apellido: '',
+    edad: '',
+    pais: '',
+    ciudad: ''
+  });
+  
+  const chance = new Chance();
+
   const obtenerPerro = () => {
     setLoading(true)
     axios
       .get("https://dog.ceo/api/breeds/image/random")
       .then((response) => {
-        console.log(response)
-        setPerro(response.data.message)
+        const nuevoPerroConNombre = {
+          imagen: response.data.message,
+          nombre: chance.first(),
+          apellido: chance.last(),
+          edad: chance.age({ type: "child" }),
+          pais: chance.country({ full: true }),
+          ciudad: chance.city()
+        }
+        setPerro(response.data.message);
+        setPerroConNombre(nuevoPerroConNombre);
         setLoading(false)
       })
   };
 
-
-  const chance = new Chance();
-  const perroConNombre = {
-    imagen: perro,
-    nombre: chance.first(),
-    apellido: chance.last(),
-    edad: chance.age({ type: "child" }),
-    pais: chance.country({ full: true }),
-    ciudad: chance.city()
-  }
 
   const aceptarPerro = () => {
     obtenerPerro();
@@ -75,7 +84,6 @@ function App() {
           sx={{ background: "white", width: "400px", height: "600px", border: "2px solid black", overflow: "auto" }}
           borderRadius={5}>
           <h2>Rechazados</h2>
-
           {rechazado.map((perroConNombre, index) => (
             <>
               <img key={perroConNombre.nombre} src={perroConNombre.imagen} alt="Perro rechazado" style={{ width: "250px", height: "25%", borderRadius: "3%", margin: "10px" }} />

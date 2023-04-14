@@ -49,7 +49,7 @@ function App() {
         alignItems='center' >
         <Grid
           item md={3}
-          sx={{ background: "white", width: "400px", height: "600px", border: "2px solid black" }}
+          sx={{ background: "white", width: "400px", height: "600px", border: "2px solid black", overflow: "auto" }}
           borderRadius={5}>
           {rechazado.map((image, index) => (
             <img key={index} src={image} alt="Perro aleatorio" style={{ width: "250px", height: "25%", borderRadius: "3%", margin:"10px" }}/>
@@ -57,7 +57,7 @@ function App() {
         </Grid>
         <Grid
           item md={5}
-          sx={{ background: "white", width: "600px", height: "600px", margin: "0 40px", justifyContent: 'center', padding: "15px", border: "2px solid black" }}
+          sx={{ background: "white", width: "600px", height: "600px", margin: "0 40px", justifyContent: 'center', padding: "15px", border: "2px solid black"}}
           borderRadius={5} >
           <img src={perro} alt="Perro aleatorio" style={{ width: "450px", height: "50%", borderRadius: "3%" }} />
           <Box>
@@ -77,7 +77,7 @@ function App() {
         </Grid>
         <Grid
           item md={3}
-          sx={{ background: "white ", width: "400px", height: "600px", border: "2px solid black" }}
+          sx={{ background: "white ", width: "400px", height: "600px", border: "2px solid black", overflow: "auto" }}
           borderRadius={5}>
           {aceptado.map((image, index) => (
             <img key={index} src={image} alt="Perro aleatorio" style={{ width: "250px", height: "25%", borderRadius: "3%", margin:"10px" }} />

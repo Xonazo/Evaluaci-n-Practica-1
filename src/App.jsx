@@ -2,13 +2,11 @@ import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { Box, Grid, Paper, IconButton } from '@mui/material';
+import { Box, Grid, Paper, IconButton, Button } from '@mui/material';
 import axios from 'axios';
 import like from './assets/like.png'
 import dislike from './assets/dislike.png'
-import nombreFirst from "./assets/nombres.txt";
-import apellidoFirst from "./assets/apellidos.txt";
-
+import Chance from 'chance';
 
 function App() {
 
@@ -19,45 +17,43 @@ function App() {
   const [apellidos, setApellidos] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const obtenerPerro = () => {
+  const [perroConNombre, setPerroConNombre] = useState({
+    imagen: '',
+    nombre: '',
+    apellido: '',
+    edad: '',
+    pais: '',
+    ciudad: ''
+  });
 
+  const chance = new Chance();
+
+  const obtenerPerro = () => {
     setLoading(true)
     axios
       .get("https://dog.ceo/api/breeds/image/random")
       .then((response) => {
-        console.log(response)
-        setPerro(response.data.message)
+        const nuevoPerroConNombre = {
+          imagen: response.data.message,
+          nombre: chance.first(),
+          apellido: chance.last(),
+          edad: chance.age({ type: "child" }),
+          pais: chance.country({ full: true }),
+          ciudad: chance.city()
+        }
+        setPerro(response.data.message);
+        setPerroConNombre(nuevoPerroConNombre);
         setLoading(false)
-      })
-
-    axios.get(nombreFirst)
-      .then((response) => {
-        setNombres(response.data.split("\n"))
-      })
-
-    axios.get(apellidoFirst)
-      .then((response) => {
-        setApellidos(response.data.split("\n"));
       })
   };
 
-  const indiceAleatorio = Math.floor(Math.random() * nombres.length);
-  const indiceAleatorio2 = Math.floor(Math.random() * apellidos.length);
 
-  const perroConNombre = {
-    imagen: perro,
-    nombre: nombres[indiceAleatorio],
-    apellido: apellidos[indiceAleatorio2]
-  }
-
-  const aceptarPerro = (index) => {
-    
-    setAceptado([...aceptado, perroConNombre]);
+  const aceptarPerro = () => {
     obtenerPerro();
+    setAceptado([...aceptado, perroConNombre]);
   }
 
-  const rechazarPerro = (index) => {
-    
+  const rechazarPerro = () => {
     setRechazado([...rechazado, perroConNombre]);
     obtenerPerro();
   }
@@ -65,6 +61,16 @@ function App() {
   useEffect(() => {
     obtenerPerro()
   }, [])
+
+  const agregarPerroAceptado = (perro) => {
+    setAceptado([...aceptado, perro]);
+    setRechazado(rechazado.filter(p => p.nombre !== perro.nombre));
+  }
+
+  const agregarPerroRechazado = (perro) => {
+    setRechazado([...rechazado, perro]);
+    setAceptado(aceptado.filter(p => p.nombre !== perro.nombre));
+  }
 
 
   return (
@@ -75,46 +81,141 @@ function App() {
         alignItems='center' >
         <Grid
           item md={3}
-          sx={{ background: "white", width: "400px", height: "600px", border: "2px solid black", overflow:"auto"}}
+          sx={{
+            background: "white",
+            width: "400px",
+            height: "600px",
+            border: "2px solid black",
+            overflow: "auto"
+          }}
           borderRadius={5}>
+          <h2>Rechazados</h2>
           {rechazado.map((perroConNombre, index) => (
             <>
-            <img key={perroConNombre.nombre} src={perroConNombre.imagen} alt="Perro rechazado" style={{ width: "250px", height: "25%", borderRadius: "3%", margin: "10px" }} />
-            <h2>{perroConNombre.nombre} {perroConNombre.apellido}</h2>
+              <img key={perroConNombre.nombre}
+                src={perroConNombre.imagen}
+                alt="Perro rechazado"
+                style={{
+                  width: "250px",
+                  height: "25%",
+                  borderRadius: "3%",
+                  margin: "10px"
+                }} />
+              <Box style={{ marginTop: "-30px" }}>
+                <h2>{perroConNombre.nombre} {perroConNombre.apellido}</h2>
+                <Button onClick={() => agregarPerroAceptado(perroConNombre)} style={{ marginTop: "-25px" }} >Cambiar</Button>
+              </Box>
             </>
-          
           ))}
-
         </Grid>
         <Grid
           item md={5}
-          sx={{ background: "white", width: "600px", height: "600px", margin: "0 40px", justifyContent: 'center', padding: "15px", border: "2px solid black" }}
+          sx={{
+            background: "white",
+            width: "600px",
+            height: "600px",
+            margin: "0 40px",
+            justifyContent: 'center',
+            padding: "15px",
+            border: "2px solid black"
+          }}
           borderRadius={5} >
-          <img src={perro} alt="Perro aleatorio" style={{ width: "450px", height: "50%", borderRadius: "3%" }} />
-          <Box>
-            <h1>{perroConNombre.nombre} {perroConNombre.apellido}</h1>
+          <img src={perro}
+            alt="Perro aleatorio"
+            style={{
+              width: "450px",
+              height: "50%",
+              borderRadius: "3%"
+            }} />
+          <Box sx={{
+            justifyContent: 'center',
+            display: "flex",
+            marginTop: "-44px"
+          }}>
+            <IconButton style={{
+              backgroundColor: "white"
+            }}
+              onClick={() => rechazarPerro()}
+              disableTouchRipple
+              sx={{
+                '&:focus': { outline: 'none' },
+                opacity: loading ? 0.5 : 1,
+                transition: 'opacity 0.2s ease',
+                border: "7px solid #e3e4e5",
+                marginRight: "3px"
+              }}
+              disabled={loading}>
+              <img
+                src={dislike}
+                alt="dislike"
+                style={{
+                  width: "50px",
+                  height: "40px",
+                }} />
+            </IconButton>
+            <IconButton
+              style={{
+                backgroundColor: "white"
+              }}
+              onClick={() => aceptarPerro()}
+              disableTouchRipple
+              sx={{
+                '&:focus': { outline: 'none' },
+                opacity: loading ? 0.5 : 1,
+                transition: 'opacity 0.2s ease',
+                border: "7px solid #e3e4e5",
+                marginLeft: "3px"
+              }}
+              disabled={loading}>
+              <img
+                src={like}
+                alt="like"
+                style={{
+                  width: "55px",
+                  height: "50px"
+                }} />
+            </IconButton>
           </Box>
-          <Box sx={{ justifyContent: 'space-around', display: "flex", margin: "80px" }}>
-            <IconButton onClick={()=> rechazarPerro()} disableTouchRipple sx={{ '&:focus': { outline: 'none' } }} disabled={loading}>
-              <img src={dislike} alt="dislike" style={{ width: "45px", height: "40px", }} />
-            </IconButton>
-            <IconButton onClick={()=> aceptarPerro()} disableTouchRipple sx={{ '&:focus': { outline: 'none' } }} disabled={loading}>
-              <img src={like} alt="like" style={{ width: "55px", height: "50px" }} />
-            </IconButton>
-
+          <Box style={{
+            textAlign: 'left',
+            lineHeight: '1'
+          }}>
+            <Box style={{
+              marginTop: "-16px"
+            }}>
+              <h1>{perroConNombre.nombre} {perroConNombre.apellido}, {perroConNombre.edad}</h1>
+            </Box>
+            <h2>{perroConNombre.pais} - {perroConNombre.ciudad} </h2>
           </Box>
         </Grid>
         <Grid
           item md={3}
-          sx={{ background: "white ", width: "400px", height: "600px", border: "2px solid black" , overflow:"auto"}}
+          sx={{
+            background: "white ",
+            width: "400px",
+            height: "600px",
+            border: "2px solid black",
+            overflow: "auto"
+          }}
           borderRadius={5}>
+          <h2>Aceptados</h2>
           {aceptado.map((perroConNombre, index) => (
             <>
-              <img key={perroConNombre.nombre} src={perroConNombre.imagen} alt="Perro aceptado" style={{ width: "250px", height: "25%", borderRadius: "3%", margin: "10px" }} />
-              <h2>{perroConNombre.nombre} {perroConNombre.apellido}</h2>
+              <img key={perroConNombre.nombre}
+                src={perroConNombre.imagen}
+                alt="Perro aceptado"
+                style={{
+                  width: "250px",
+                  height: "25%",
+                  borderRadius: "3%",
+                  margin: "10px"
+                }} />
+              <Box style={{ marginTop: "-30px" }}>
+                <h2>{perroConNombre.nombre} {perroConNombre.apellido}</h2>
+                <Button onClick={() => agregarPerroRechazado(perroConNombre)} style={{ marginTop: "-25px" }}>Cambiar</Button>
+              </Box>
             </>
           ))}
-
         </Grid>
       </Grid>
     </Box>
@@ -122,3 +223,4 @@ function App() {
 }
 
 export default App
+

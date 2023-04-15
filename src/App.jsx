@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { Box, Grid, Paper, IconButton, Button } from '@mui/material';
+import { Box, Grid, Paper, IconButton, Button, Grow } from '@mui/material';
 import axios from 'axios';
 import like from './assets/like.png'
 import dislike from './assets/dislike.png'
@@ -25,7 +25,7 @@ function App() {
     pais: '',
     ciudad: ''
   });
-  
+
   const chance = new Chance();
 
   const obtenerPerro = () => {
@@ -81,12 +81,27 @@ function App() {
         alignItems='center' >
         <Grid
           item md={3}
-          sx={{ background: "white", width: "400px", height: "600px", border: "2px solid black", overflow: "auto" }}
+          sx={{
+            background: "white",
+            width: "400px",
+            height: "600px",
+            boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.5)',
+            overflow: "auto"
+          }}
           borderRadius={5}>
           <h2>Rechazados</h2>
           {rechazado.map((perroConNombre, index) => (
             <>
-              <img key={perroConNombre.nombre} src={perroConNombre.imagen} alt="Perro rechazado" style={{ width: "250px", height: "25%", borderRadius: "3%", margin: "10px" }} />
+              <img
+                key={perroConNombre.nombre}
+                src={perroConNombre.imagen}
+                alt="Perro rechazado"
+                style={{
+                  width: "250px",
+                  height: "25%",
+                  borderRadius: "3%",
+                  margin: "10px"
+                }} />
               <h2>{perroConNombre.nombre} {perroConNombre.apellido}</h2>
               <Button onClick={() => agregarPerroAceptado(perroConNombre)}>Cambiar</Button>
             </>
@@ -94,36 +109,98 @@ function App() {
         </Grid>
         <Grid
           item md={5}
-          sx={{ background: "white", width: "600px", height: "800px", margin: "0 40px", justifyContent: 'center', padding: "15px", border: "2px solid black" }}
+          sx={{
+            background: "white",
+            width: "600px",
+            height: "800px",
+            margin: "0 40px",
+            justifyContent: 'center',
+            padding: "15px",
+            boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.5)'
+          }}
           borderRadius={5} >
-          <img src={perro} alt="Perro aleatorio" style={{ width: "450px", height: "50%", borderRadius: "3%" }} />
+          <img src={perro}
+            alt="Perro aleatorio"
+            style={{
+              width: "450px",
+              height: "50%",
+              borderRadius: "4%",
+              boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.4)'
+            }} />
           <Box>
             <h1>{perroConNombre.nombre} {perroConNombre.apellido}, {perroConNombre.edad}</h1>
             <p> Pais: {perroConNombre.pais}</p>
             <p>Ciudad: {perroConNombre.ciudad} </p>
           </Box>
-          <Box sx={{ justifyContent: 'space-around', display: "flex", margin: "50px" }}>
-            <IconButton onClick={() => rechazarPerro()} disableTouchRipple sx={{ '&:focus': { outline: 'none' }, opacity: loading ? 0.5 : 1, transition: 'opacity 0.2s ease' }} disabled={loading}>
-              <img src={dislike} alt="dislike" style={{ width: "45px", height: "40px", }} />
+          <Box sx={{
+            justifyContent: 'space-around',
+            display: "flex",
+            margin: "50px"
+          }}>
+            <IconButton
+              onClick={() => rechazarPerro()}
+              disableTouchRipple
+              sx={{
+                '&:focus': { outline: 'none' },
+                opacity: loading ? 0.5 : 1,
+                transition: 'opacity 0.2s ease',
+                "&:hover": {
+                  transform: "scale(1.2)",
+                },
+              }}
+              disabled={loading}>
+              <img src={dislike}
+                alt="dislike"
+                style={{ width: "45px", height: "40px", }} />
             </IconButton>
-            <IconButton onClick={() => aceptarPerro()} disableTouchRipple sx={{ '&:focus': { outline: 'none' }, opacity: loading ? 0.5 : 1, transition: 'opacity 0.2s ease' }} disabled={loading}>
-              <img src={like} alt="like" style={{ width: "55px", height: "50px" }} />
+            <IconButton onClick={() => aceptarPerro()}
+              disableTouchRipple
+              sx={{
+                '&:focus': { outline: 'none' },
+                opacity: loading ? 0.5 : 1,
+                transition: 'opacity 0.2s ease',
+                "&:hover": {
+                  transform: "scale(1.2)",
+                },
+              }}
+              disabled={loading}>
+              <img src={like}
+                alt="like"
+                style={{
+                  width: "55px",
+                  height: "50px"
+                }} />
             </IconButton>
           </Box>
         </Grid>
         <Grid
           item md={3}
-          sx={{ background: "white ", width: "400px", height: "600px", border: "2px solid black", overflow: "auto" }}
+          sx={{
+            background: "white ",
+            width: "400px",
+            height: "600px",
+            boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.5)',
+            overflow: "auto"
+          }}
           borderRadius={5}>
           <h2>Aceptados</h2>
           {aceptado.map((perroConNombre, index) => (
-            <>
-              <img key={perroConNombre.nombre} src={perroConNombre.imagen} alt="Perro aceptado" style={{ width: "250px", height: "25%", borderRadius: "3%", margin: "10px" }} />
+            <Box key={perroConNombre.nombre} >
+              <img
+                key={perroConNombre.nombre}
+                src={perroConNombre.imagen}
+                alt="Perro aceptado"
+                style={{
+                  width: "250px",
+                  height: "25%",
+                  borderRadius: "3%",
+                  margin: "10px"
+                }} />
               <h2>{perroConNombre.nombre} {perroConNombre.apellido}</h2>
-              <Button onClick={() => agregarPerroRechazado(perroConNombre)}>Cambiar</Button>
-            </>
+              <Button
+                onClick={() => agregarPerroRechazado(perroConNombre)}>Cambiar</Button>
+            </Box>
           ))}
-
         </Grid>
       </Grid>
     </Box>

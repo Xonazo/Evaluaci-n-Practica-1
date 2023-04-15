@@ -23,7 +23,8 @@ function App() {
     apellido: '',
     edad: '',
     pais: '',
-    ciudad: ''
+    ciudad: '',
+    descripcion: ''
   });
 
   const chance = new Chance();
@@ -39,7 +40,8 @@ function App() {
           apellido: chance.last(),
           edad: chance.age({ type: "child" }),
           pais: chance.country({ full: true }),
-          ciudad: chance.city()
+          ciudad: chance.city(),
+          descripcion: chance.paragraph({ sentences: 1 })
         }
         setPerro(response.data.message);
         setPerroConNombre(nuevoPerroConNombre);
@@ -85,15 +87,14 @@ function App() {
             background: "white",
             width: "400px",
             height: "600px",
-            boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.5)',
-            overflow: "auto"
+            overflow: "auto",
+            boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.5)'
           }}
           borderRadius={5}>
           <h2>Rechazados</h2>
           {rechazado.map((perroConNombre, index) => (
             <>
-              <img
-                key={perroConNombre.nombre}
+              <img key={perroConNombre.nombre}
                 src={perroConNombre.imagen}
                 alt="Perro rechazado"
                 style={{
@@ -102,8 +103,10 @@ function App() {
                   borderRadius: "3%",
                   margin: "10px"
                 }} />
-              <h2>{perroConNombre.nombre} {perroConNombre.apellido}</h2>
-              <Button onClick={() => agregarPerroAceptado(perroConNombre)}>Cambiar</Button>
+              <Box style={{ marginTop: "-30px" }}>
+                <h2>{perroConNombre.nombre} {perroConNombre.apellido}</h2>
+                <Button onClick={() => agregarPerroAceptado(perroConNombre)} style={{ marginTop: "-25px" }} >Cambiar</Button>
+              </Box>
             </>
           ))}
         </Grid>
@@ -112,7 +115,7 @@ function App() {
           sx={{
             background: "white",
             width: "600px",
-            height: "800px",
+            height: "600px",
             margin: "0 40px",
             justifyContent: 'center',
             padding: "15px",
@@ -124,53 +127,76 @@ function App() {
             style={{
               width: "450px",
               height: "50%",
-              borderRadius: "4%",
+              borderRadius: "3%",
               boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.4)'
             }} />
-          <Box>
-            <h1>{perroConNombre.nombre} {perroConNombre.apellido}, {perroConNombre.edad}</h1>
-            <p> Pais: {perroConNombre.pais}</p>
-            <p>Ciudad: {perroConNombre.ciudad} </p>
-          </Box>
           <Box sx={{
-            justifyContent: 'space-around',
+            justifyContent: 'center',
             display: "flex",
-            margin: "50px"
+            marginTop: "-44px"
           }}>
-            <IconButton
+            <IconButton style={{
+              backgroundColor: "white"
+            }}
               onClick={() => rechazarPerro()}
               disableTouchRipple
               sx={{
                 '&:focus': { outline: 'none' },
                 opacity: loading ? 0.5 : 1,
                 transition: 'opacity 0.2s ease',
+                border: "7px solid #e3e4e5",
+                marginRight: "3px",
                 "&:hover": {
                   transform: "scale(1.2)",
                 },
               }}
               disabled={loading}>
-              <img src={dislike}
+              <img
+                src={dislike}
                 alt="dislike"
-                style={{ width: "45px", height: "40px", }} />
+                style={{
+                  width: "50px",
+                  height: "40px",
+                }} />
             </IconButton>
-            <IconButton onClick={() => aceptarPerro()}
+            <IconButton
+              style={{
+                backgroundColor: "white"
+              }}
+              onClick={() => aceptarPerro()}
               disableTouchRipple
               sx={{
                 '&:focus': { outline: 'none' },
                 opacity: loading ? 0.5 : 1,
                 transition: 'opacity 0.2s ease',
+                border: "7px solid #e3e4e5",
+                marginLeft: "3px",
                 "&:hover": {
                   transform: "scale(1.2)",
                 },
               }}
               disabled={loading}>
-              <img src={like}
+              <img
+                src={like}
                 alt="like"
                 style={{
                   width: "55px",
                   height: "50px"
                 }} />
             </IconButton>
+          </Box>
+          <Box style={{
+            textAlign: 'left',
+            lineHeight: '1'
+          }}>
+            <Box style={{
+              marginTop: "-16px"
+            }}>
+              <h1>{perroConNombre.nombre} {perroConNombre.apellido}, {perroConNombre.edad}</h1>
+            </Box>
+            <h2>{perroConNombre.pais} - {perroConNombre.ciudad} </h2>
+            <p>{perroConNombre.descripcion}</p>
+            {loading && <p style={{ fontWeight: 'bold' }}>Cargando...</p>}
           </Box>
         </Grid>
         <Grid
@@ -185,9 +211,8 @@ function App() {
           borderRadius={5}>
           <h2>Aceptados</h2>
           {aceptado.map((perroConNombre, index) => (
-            <Box key={perroConNombre.nombre} >
-              <img
-                key={perroConNombre.nombre}
+            <>
+              <img key={perroConNombre.nombre}
                 src={perroConNombre.imagen}
                 alt="Perro aceptado"
                 style={{
@@ -196,10 +221,11 @@ function App() {
                   borderRadius: "3%",
                   margin: "10px"
                 }} />
-              <h2>{perroConNombre.nombre} {perroConNombre.apellido}</h2>
-              <Button
-                onClick={() => agregarPerroRechazado(perroConNombre)}>Cambiar</Button>
-            </Box>
+              <Box style={{ marginTop: "-30px" }}>
+                <h2>{perroConNombre.nombre} {perroConNombre.apellido}</h2>
+                <Button onClick={() => agregarPerroRechazado(perroConNombre)} style={{ marginTop: "-25px" }}>Cambiar</Button>
+              </Box>
+            </>
           ))}
         </Grid>
       </Grid>

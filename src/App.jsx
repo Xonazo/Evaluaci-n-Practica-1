@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+<<<<<<< HEAD
 import { Box, Grid, Paper, IconButton, Button, Grow } from '@mui/material';
+=======
+import { Box, Grid, Paper, IconButton, Button } from '@mui/material';
+>>>>>>> origin/nelson2
 import axios from 'axios';
 import like from './assets/like.png'
 import dislike from './assets/dislike.png'
@@ -208,3 +212,4 @@ function App() {
 }
 
 export default App
+

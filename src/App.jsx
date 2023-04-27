@@ -2,67 +2,40 @@ import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { Box, Grid, Paper, IconButton, Button, Grow } from '@mui/material';
+import { Box, Grid, Paper, IconButton, Button, Grow, CircularProgress, circularProgressClasses, Tooltip } from '@mui/material';
 import axios from 'axios';
 import like from './assets/like.png'
 import dislike from './assets/dislike.png'
 import Chance from 'chance';
+import { useBuscarInfoQuery } from './queries/buscarPerro.jsx'
+import ojo from './assets/ojo.png'
+import change from './assets/change.png'
+
+
+
+
 
 function App() {
 
-  const [perro, setPerro] = useState()
   const [aceptado, setAceptado] = useState([])
   const [rechazado, setRechazado] = useState([])
-  const [nombres, setNombres] = useState([])
-  const [apellidos, setApellidos] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [params, setParams] = useState()
+  const [mostrarDescripcion, setMostrarDescripcion] = useState([]);
 
-  const [perroConNombre, setPerroConNombre] = useState({
-    imagen: '',
-    nombre: '',
-    apellido: '',
-    edad: '',
-    pais: '',
-    ciudad: '',
-    descripcion: ''
-  });
-
-  const chance = new Chance();
-
-  const obtenerPerro = () => {
-    setLoading(true)
-    axios
-      .get("https://dog.ceo/api/breeds/image/random")
-      .then((response) => {
-        const nuevoPerroConNombre = {
-          imagen: response.data.message,
-          nombre: chance.first(),
-          apellido: chance.last(),
-          edad: chance.age({ type: "child" }),
-          pais: chance.country({ full: true }),
-          ciudad: chance.city(),
-          descripcion: chance.paragraph({ sentences: 1 })
-        }
-        setPerro(response.data.message);
-        setPerroConNombre(nuevoPerroConNombre);
-        setLoading(false)
-      })
-  };
 
 
   const aceptarPerro = () => {
-    obtenerPerro();
-    setAceptado([...aceptado, perroConNombre]);
+    recargar();
+    setAceptado([infoPerro, ...aceptado]);
+
   }
 
   const rechazarPerro = () => {
-    setRechazado([...rechazado, perroConNombre]);
-    obtenerPerro();
+    setRechazado([infoPerro, ...rechazado]);
+    recargar();
+
   }
 
-  useEffect(() => {
-    obtenerPerro()
-  }, [])
 
   const agregarPerroAceptado = (perro) => {
     setAceptado([...aceptado, perro]);
@@ -74,116 +47,125 @@ function App() {
     setAceptado(aceptado.filter(p => p.nombre !== perro.nombre));
   }
 
+  const {
+    data: infoPerro,
+    isFetching: cargando,
+    refetch: recargar,
+    isError: errors,
+  } = useBuscarInfoQuery(params);
+  console.log(cargando)
+
+
+  //cambiar las imagenes y dejarlas igual que el primer grid, osea en porcentajes
+
 
   return (
     <Box>
       <Grid container
+        columns={12}
+        gap={2}
         direction={'row'}
         justifyContent='center'
-        alignItems='center' >
-        <Grid
-          item md={3}
-          sx={{
-            background: "white",
-            width: "400px",
-            height: "600px",
-            overflow: "auto",
-            boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.5)'
-          }}
-          borderRadius={5}>
-          <h2>Rechazados</h2>
-          {rechazado.map((perroConNombre, index) => (
-            <>
-              <img key={perroConNombre.nombre}
-                src={perroConNombre.imagen}
-                alt="Perro rechazado"
-                style={{
-                  width: "250px",
-                  height: "25%",
-                  borderRadius: "3%",
-                  margin: "10px"
-                }} />
-              <Box style={{ marginTop: "-30px" }}>
-                <h2>{perroConNombre.nombre} {perroConNombre.apellido}</h2>
-                <Button onClick={() => agregarPerroAceptado(perroConNombre)} style={{ marginTop: "-25px" }} >Cambiar</Button>
-              </Box>
-            </>
-          ))}
-        </Grid>
+        alignItems='center'
+        sx={{
+          scrollX: "hidden",
+          margin: "0px"
+        }}
+      >
         <Grid
           item md={5}
+          xs={7}
+          sm={7}
           sx={{
             background: "white",
             width: "600px",
             height: "600px",
-            margin: "0 40px",
             justifyContent: 'center',
             padding: "15px",
-            boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.5)'
+            boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.5)',
+            overflowY: "auto",
           }}
           borderRadius={5} >
-          <img src={perro}
-            alt="Perro aleatorio"
-            style={{
-              width: "450px",
-              height: "50%",
-              borderRadius: "3%",
-              boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.4)'
-            }} />
+          <Box style={{
+            height: "50%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}>
+            {cargando ? (
+              <CircularProgress />
+            ) : (
+              <img
+                src={infoPerro?.imagen}
+                alt="Perro aleatorio"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: "3%",
+                  boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.4)'
+                }}
+              />
+            )}
+          </Box>
           <Box sx={{
             justifyContent: 'center',
             display: "flex",
             marginTop: "-44px"
           }}>
-            <IconButton style={{
-              backgroundColor: "white"
-            }}
-              onClick={() => rechazarPerro()}
-              disableTouchRipple
-              sx={{
-                '&:focus': { outline: 'none' },
-                opacity: loading ? 0.5 : 1,
-                transition: 'opacity 0.2s ease',
-                border: "7px solid #e3e4e5",
-                marginRight: "3px",
-                "&:hover": {
-                  transform: "scale(1.2)",
-                },
-              }}
-              disabled={loading}>
-              <img
-                src={dislike}
-                alt="dislike"
-                style={{
-                  width: "50px",
-                  height: "40px",
-                }} />
-            </IconButton>
-            <IconButton
-              style={{
+            <Tooltip title="Rechazar">
+              <IconButton style={{
                 backgroundColor: "white"
               }}
-              onClick={() => aceptarPerro()}
-              disableTouchRipple
-              sx={{
-                '&:focus': { outline: 'none' },
-                opacity: loading ? 0.5 : 1,
-                transition: 'opacity 0.2s ease',
-                border: "7px solid #e3e4e5",
-                marginLeft: "3px",
-                "&:hover": {
-                  transform: "scale(1.2)",
-                },
-              }}
-              disabled={loading}>
-              <img
-                src={like}
-                alt="like"
+                onClick={() => rechazarPerro()}
+                disableTouchRipple
+                sx={{
+                  '&:focus': { outline: 'none' },
+                  opacity: cargando ? 0.5 : 1,
+                  transition: 'opacity 0.2s ease',
+                  border: "7px solid #e3e4e5",
+                  marginRight: "3px",
+                  "&:hover": {
+                    transform: "scale(1.2)",
+                  },
+                }}
+                disabled={cargando}>
+                <img
+                  src={dislike}
+                  alt="dislike"
+                  style={{
+                    width: "50px",
+                    height: "40px",
+                  }} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Aceptar">
+              <IconButton
                 style={{
-                  width: "55px",
-                  height: "50px"
-                }} />
-            </IconButton>
+                  backgroundColor: "white"
+                }}
+                onClick={() => aceptarPerro()}
+                disableTouchRipple
+                sx={{
+                  '&:focus': { outline: 'none' },
+                  opacity: cargando ? 0.5 : 1,
+                  transition: 'opacity 0.2s ease',
+                  border: "7px solid #e3e4e5",
+                  marginLeft: "3px",
+                  "&:hover": {
+                    transform: "scale(1.2)",
+                  },
+                }}
+                disabled={cargando}>
+                <img
+                  src={like}
+                  alt="like"
+                  style={{
+                    width: "55px",
+                    height: "50px"
+                  }} />
+              </IconButton>
+            </Tooltip>
           </Box>
           <Box style={{
             textAlign: 'left',
@@ -192,44 +174,170 @@ function App() {
             <Box style={{
               marginTop: "-16px"
             }}>
-              <h1>{perroConNombre.nombre} {perroConNombre.apellido}, {perroConNombre.edad}</h1>
+              <h1>{infoPerro?.nombre} {infoPerro?.apellido}, {infoPerro?.edad}</h1>
             </Box>
-            <h2>{perroConNombre.pais} - {perroConNombre.ciudad} </h2>
-            <p>{perroConNombre.descripcion}</p>
-            {loading && <p style={{ fontWeight: 'bold' }}>Cargando...</p>}
+            <h2>{infoPerro?.pais} - {infoPerro?.ciudad} </h2>
+            <p>{infoPerro?.descripcion}</p>
           </Box>
         </Grid>
+
+
         <Grid
           item md={3}
+          xs={7}
+          sm={5}
+
           sx={{
             background: "white ",
             width: "400px",
             height: "600px",
             boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.5)',
-            overflow: "auto"
+            overflowY: "auto",
+            "&::-webkit-scrollbar": {
+              width: "10px",
+              height: "10px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#ccc",
+              borderRadius: "10px",
+            },
+
+
           }}
           borderRadius={5}>
           <h2>Aceptados</h2>
-          {aceptado.map((perroConNombre, index) => (
-            <>
-              <img key={perroConNombre.nombre}
-                src={perroConNombre.imagen}
+          {aceptado.map((perrosAceptados, index) => (
+            <Box
+              key={index}>
+              <img
+                key={perrosAceptados.nombre}
+                src={perrosAceptados.imagen}
                 alt="Perro aceptado"
                 style={{
                   width: "250px",
                   height: "25%",
                   borderRadius: "3%",
                   margin: "10px"
-                }} />
+                }}
+              />
               <Box style={{ marginTop: "-30px" }}>
-                <h2>{perroConNombre.nombre} {perroConNombre.apellido}</h2>
-                <Button onClick={() => agregarPerroRechazado(perroConNombre)} style={{ marginTop: "-25px" }}>Cambiar</Button>
+                <h2>
+                  {perrosAceptados.nombre} {perrosAceptados.apellido}
+                </h2>
+
+                <Tooltip title="Cambiar de Fila">
+                  <IconButton onClick={() => agregarPerroRechazado(perrosAceptados)} >
+                    <img
+                      src={change}
+                      alt="Change List"
+                      style={{
+                        width: "40px",
+                        height: "40px"
+                      }} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Mostrar Descripcion">
+                  <IconButton
+                    onClick={() => {
+                      const nuevosValores = [...mostrarDescripcion];
+                      nuevosValores[index] = !nuevosValores[index];
+                      setMostrarDescripcion(nuevosValores);
+                    }}>
+                    <img
+                      src={ojo}
+                      alt="Mostrar Descripcion"
+                      style={{
+                        width: "40px",
+                        height: "40px"
+                      }} />
+                  </IconButton>
+                </Tooltip>
+                {mostrarDescripcion[index] && (
+                  <p style={{ fontSize: '18px' }}>{perrosAceptados.descripcion}</p>
+                )}
               </Box>
-            </>
+            </Box>
+          ))}
+        </Grid>
+
+        <Grid
+
+          xs={7}
+          sm={5}
+          item md={3}
+          sx={{
+            background: "white",
+            width: "400px",
+            height: "600px",
+            boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.5)',
+            overflowY: "auto",
+            "&::-webkit-scrollbar": {
+              width: "10px",
+              height: "10px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#ccc",
+              borderRadius: "10px",
+            },
+          }}
+          borderRadius={5}>
+          <h2>Rechazados</h2>
+          {rechazado.map((perroRechazados, index) => (
+            <Box
+              key={index}>
+              <img
+                key={perroRechazados.nombre}
+                src={perroRechazados.imagen}
+                alt="Perro rechazado"
+                style={{
+                  width: "250px",
+                  height: "25%",
+                  borderRadius: "3%",
+                  margin: "10px"
+                }}
+              />
+              <Box style={{ marginTop: "-30px" }}>
+                <h2>{perroRechazados.nombre} {perroRechazados.apellido}</h2>
+                <Box>
+                  <Tooltip title="Cambiar de Fila">
+                    <IconButton onClick={() => agregarPerroAceptado(perroRechazados)}>
+                      <img
+                        src={change}
+                        alt="Change List"
+                        style={{
+                          width: "40px",
+                          height: "40px"
+                        }} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Mostrar Descripcion">
+                    <IconButton
+                      onClick={() => {
+                        const nuevosValores = [...mostrarDescripcion];
+                        nuevosValores[index + aceptado.length] = !nuevosValores[index + aceptado.length];
+                        setMostrarDescripcion(nuevosValores);
+                      }}
+                    >
+                      <img
+                        src={ojo}
+                        alt="Show List"
+                        style={{
+                          width: "40px",
+                          height: "40px"
+                        }} />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+                {mostrarDescripcion[index + aceptado.length] && (
+                  <p style={{ fontSize: '18px' }}>{perroRechazados.descripcion}</p>
+                )}
+              </Box>
+            </Box>
           ))}
         </Grid>
       </Grid>
     </Box>
+
   )
 }
 

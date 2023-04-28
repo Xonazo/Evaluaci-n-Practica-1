@@ -38,12 +38,12 @@ function App() {
 
 
   const agregarPerroAceptado = (perro) => {
-    setAceptado([...aceptado, perro]);
+    setAceptado([perro, ...aceptado]);
     setRechazado(rechazado.filter(p => p.nombre !== perro.nombre));
   }
 
   const agregarPerroRechazado = (perro) => {
-    setRechazado([...rechazado, perro]);
+    setRechazado([ perro,...rechazado]);
     setAceptado(aceptado.filter(p => p.nombre !== perro.nombre));
   }
 
@@ -73,7 +73,7 @@ function App() {
         }}
       >
         <Grid
-          item md={5}
+          item md={4}
           xs={7}
           sm={7}
           sx={{

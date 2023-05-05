@@ -9,7 +9,9 @@ import dislike from './assets/dislike.png'
 import Chance from 'chance';
 import { useBuscarInfoQuery } from './queries/buscarPerro.jsx'
 import ojo from './assets/ojo.png'
-import change from './assets/change.png'
+import invisible from './assets/ojo-cerrado.png'
+import visible from './assets/ojo.png'
+import change from './assets/actualizar.png'
 
 
 
@@ -20,7 +22,9 @@ function App() {
   const [aceptado, setAceptado] = useState([])
   const [rechazado, setRechazado] = useState([])
   const [params, setParams] = useState()
-  const [mostrarDescripcion, setMostrarDescripcion] = useState([]);
+  const [mostrarDescripcion, setMostrarDescripcion] = useState(
+    [...aceptado, ...rechazado].map(() => false)
+  );
 
 
 
@@ -43,7 +47,7 @@ function App() {
   }
 
   const agregarPerroRechazado = (perro) => {
-    setRechazado([ perro,...rechazado]);
+    setRechazado([perro, ...rechazado]);
     setAceptado(aceptado.filter(p => p.nombre !== perro.nombre));
   }
 
@@ -184,7 +188,7 @@ function App() {
 
         <Grid
           item md={3}
-          xs={7}
+          xs={5}
           sm={5}
 
           sx={{
@@ -215,9 +219,12 @@ function App() {
                 alt="Perro aceptado"
                 style={{
                   width: "250px",
-                  height: "25%",
+                  height: "150px",
                   borderRadius: "3%",
-                  margin: "10px"
+                  margin: "10px",
+                  borderRadius: "3%",
+                  maxWidth: "100%",
+                  maxHeight: "100%",
                 }}
               />
               <Box style={{ marginTop: "-30px" }}>
@@ -242,15 +249,15 @@ function App() {
                       const nuevosValores = [...mostrarDescripcion];
                       nuevosValores[index] = !nuevosValores[index];
                       setMostrarDescripcion(nuevosValores);
-                    }}>
-                    <img
-                      src={ojo}
-                      alt="Mostrar Descripcion"
-                      style={{
-                        width: "40px",
-                        height: "40px"
-                      }} />
+                    }}
+                  >
+                    {mostrarDescripcion[index] ? (
+                      <img src={invisible} alt="Mostrar Descripcion" style={{ width: "40px", height: "40px" }} />
+                    ) : (
+                      <img src={visible} alt="Ocultar Descripcion" style={{ width: "40px", height: "40px" }} />
+                    )}
                   </IconButton>
+
                 </Tooltip>
                 {mostrarDescripcion[index] && (
                   <p style={{ fontSize: '18px' }}>{perrosAceptados.descripcion}</p>
@@ -262,7 +269,7 @@ function App() {
 
         <Grid
 
-          xs={7}
+          xs={5}
           sm={5}
           item md={3}
           sx={{
@@ -291,9 +298,12 @@ function App() {
                 alt="Perro rechazado"
                 style={{
                   width: "250px",
-                  height: "25%",
+                  height: "150px",
                   borderRadius: "3%",
-                  margin: "10px"
+                  margin: "10px",
+                  borderRadius: "3%",
+                  maxWidth: "100%",
+                  maxHeight: "100%",
                 }}
               />
               <Box style={{ marginTop: "-30px" }}>
@@ -318,13 +328,11 @@ function App() {
                         setMostrarDescripcion(nuevosValores);
                       }}
                     >
-                      <img
-                        src={ojo}
-                        alt="Show List"
-                        style={{
-                          width: "40px",
-                          height: "40px"
-                        }} />
+                      {mostrarDescripcion[index + aceptado.length] ? (
+                        <img src={invisible} alt="Mostrar Descripcion" style={{ width: "40px", height: "40px" }} />
+                      ) : (
+                        <img src={visible} alt="Ocultar Descripcion" style={{ width: "40px", height: "40px" }} />
+                      )}
                     </IconButton>
                   </Tooltip>
                 </Box>
@@ -335,6 +343,7 @@ function App() {
             </Box>
           ))}
         </Grid>
+
       </Grid>
     </Box>
 

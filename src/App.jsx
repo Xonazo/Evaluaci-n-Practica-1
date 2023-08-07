@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { Box, Grid, Paper, IconButton, Button, Grow, CircularProgress, circularProgressClasses, Tooltip } from '@mui/material';
+import { Box, Grid, Paper, IconButton, Button, Grow, CircularProgress, circularProgressClasses, Tooltip, Modal, TextField } from '@mui/material';
 import axios from 'axios';
 import like from './assets/like.png'
 import dislike from './assets/dislike.png'
@@ -12,7 +12,15 @@ import ojo from './assets/ojo.png'
 import invisible from './assets/ojo-cerrado.png'
 import visible from './assets/ojo.png'
 import change from './assets/actualizar.png'
-
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Divider from '@mui/material/Divider';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 
 
 
@@ -62,6 +70,171 @@ function App() {
 
   //cambiar las imagenes y dejarlas igual que el primer grid, osea en porcentajes
 
+  const [newPerro, setNewPerro] = useState(
+    {
+      nombre: "",
+      url_foto: "",
+      descripcion: "",
+      sexo: "",
+    },
+  );
+
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setNewPerro((prevPerro) => ({
+      ...prevPerro,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = () => {
+    // Realizar la petición al backend con axios
+    axios.post('http://127.0.0.1:8000/api/perro/create', newPerro)
+      .then((response) => {
+        // Manejar la respuesta del backend si es necesario
+        console.log(response.data);
+        // Cerrar el modal después de enviar la petición exitosamente
+        handleCloseModal();
+        window.location.reload();
+      })
+      .catch((error) => {
+        // Manejar errores si ocurren en la petición
+        console.error(error);
+      });
+  };
+
+  const [perros, setPerros] = useState([]);
+
+  const getPerro = () => {
+    axios.get('http://127.0.0.1:8000/api/perro/all')
+      .then((response) => {
+        // Manejar la respuesta del backend si es necesario
+        console.log(response.data.perros);
+        setPerros(response.data.perros);
+      })
+      .catch((error) => {
+        // Manejar errores si ocurren en la petición
+        console.error(error);
+      });
+  };
+
+  useEffect(() => {
+    getPerro();
+  }, []);
+
+  const mostrarPerro = (
+    <Box display="flex" justifyContent="center" marginTop={2}>
+      <TableContainer component={Paper} elevation={0} sx={{ maxWidth: 600 }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ fontSize: '1.2rem', color: 'black' }}>Nombre</TableCell>
+              <Divider orientation="vertical" flexItem sx={{ background: 'black' }} />
+              <TableCell sx={{ fontSize: '1.2rem', color: 'black' }}>Descripción</TableCell>
+              <Divider orientation="vertical" flexItem sx={{ background: 'black' }} />
+              <TableCell sx={{ fontSize: '1.2rem', color: 'black' }}>Sexo</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {perros.map((perro) => (
+              <TableRow key={perro.id}>
+                <TableCell>{perro.nombre}</TableCell>
+                <Divider orientation="vertical" flexItem sx={{ background: 'black' }} />
+                <TableCell>{perro.descripcion}</TableCell>
+                <Divider orientation="vertical" flexItem sx={{ background: 'black' }} />
+                <TableCell>{perro.sexo}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
+
+  );
+
+  const modalPerro = (
+    <Modal
+      open={openModal}
+      onClose={handleCloseModal}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 400,
+          bgcolor: 'background.paper',
+          boxShadow: 24,
+          p: 4,
+        }}
+      >
+        <h2 id="modal-modal-title">Formulario</h2>
+        <div id="modal-modal-description">
+          <TextField
+            name="nombre"
+            label="Nombre"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={newPerro.nombre}
+            onChange={handleChange}
+          />
+          <TextField
+            name="url_foto"
+            label="URL"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={newPerro.url_foto}
+            onChange={handleChange}
+          />
+          <TextField
+            name="descripcion"
+            label="Descripción"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={newPerro.descripcion}
+            onChange={handleChange}
+          />
+          <TextField
+            name="sexo"
+            label="Sexo"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={newPerro.sexo}
+            onChange={handleChange}
+            select
+            InputLabelProps={{
+              shrink: true,
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputLabel htmlFor="sexo-helper">Sexo</InputLabel>
+              ),
+            }}
+          >
+            <MenuItem value="macho">Macho</MenuItem>
+            <MenuItem value="hembra">Hembra</MenuItem>
+          </TextField>
+          <Button variant="contained" onClick={handleSubmit}>
+            Enviar
+          </Button>
+        </div>
+      </Box>
+    </Modal>
+  )
 
   return (
     <Box>
@@ -222,7 +395,6 @@ function App() {
                   height: "150px",
                   borderRadius: "3%",
                   margin: "10px",
-                  borderRadius: "3%",
                   maxWidth: "100%",
                   maxHeight: "100%",
                 }}
@@ -345,6 +517,12 @@ function App() {
         </Grid>
 
       </Grid>
+      <Button onClick={handleOpenModal} style={{ backgroundColor: '#f50057', color: 'white' }}>
+        Registrar Perro
+      </Button>
+
+      {modalPerro}
+      {mostrarPerro}
     </Box>
 
   )
